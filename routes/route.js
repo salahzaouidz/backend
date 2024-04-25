@@ -7,9 +7,9 @@ router.post('/doctors/signup',controllers.signupdoctors); //doctor signup
 router.get('/speciality',controllers.getspeciality); //speciality
 router.get('/medname',controllers.getmedicaments); //medecines name
 router.get('/wilayanames',controllers.getwilayanames); //wilayanames
-router.get('/admin',controllers.getadmin); //login admin
+router.post('/admin',controllers.getadmin); //login admin
 router.get('/admin/doctorsrequests',controllers.doctorsrequests); //doctorrequests
-router.get('/doctor',controllers.logindoctor);//login doctor
+router.post('/doctor',controllers.logindoctor);//login doctor
 router.post('/login',controllers.login);//login
 router.post('/patient/signup',controllers.patientsignup); //patient signup
 router.post('/admin/doctoraccept',controllers.doctoraccept); //acceptdoctornoramleandemergency
