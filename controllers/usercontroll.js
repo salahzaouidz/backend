@@ -88,10 +88,10 @@ static async getmedicaments(req,res){
         firstname : fname,
         lastname : lname,
     stats:{
-     totalPatients:250,
-     totaldoctors:50,
-     totalConsulations:1000,
-     totalVisitors:5000
+     totalPatients:400,
+     totalDoctors:5000,
+     totalConsultations:1000,
+     totalVisitors:2000
 
     }
         })
