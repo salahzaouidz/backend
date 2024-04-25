@@ -17,7 +17,7 @@ app.use(users);  //endpoints start
 
 
 app.use('/',(req,res)=>{
-    res.send('<html><body><h1>hello from medsecure server</h1></body></html>');
+    res.send(<html><body><h1>hello from medsecure server</h1></body></html>);
 })
 
 
