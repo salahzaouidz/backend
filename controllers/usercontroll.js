@@ -153,6 +153,8 @@ try {
     }
 } catch (error) {
     res.json(error);
+  console.log(error);
+
 }
 }
 //patientsignup
