@@ -143,10 +143,10 @@ try {
     app.locals.userid = id; 
        switch (role) {
         case "admin": 
-        res.redirect('http://localhost:3000/admin');
+        res.redirect('https://backend-medsecure.onrender.com/admin');
             break;
         case "doctor":
-        res.redirect('http://localhost:3000/doctor');
+        res.redirect('https://backend-medsecure.onrender.com/doctor');
             break;
        }
 
