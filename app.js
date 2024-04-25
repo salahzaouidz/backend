@@ -1,5 +1,6 @@
 const express = require('express')
 const session = require('express-session');
+const cors = require('cors');
 const app = express();
 const users  = require('./routes/route')
 const bodyParser = require('body-parser')
@@ -16,9 +17,7 @@ saveUninitialized : false
 app.use(users);  //endpoints start
 
 
-app.use('/',(req,res)=>{
-    res.send("hello world");
-})
+app.use(cors());
 
 
 
