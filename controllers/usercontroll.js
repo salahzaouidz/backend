@@ -22,7 +22,7 @@ const doctorid = req.body.doctorId;
 const wilaya  = req.body.providence;
 try{   
 
-  var y = await modeleuser.fetchuser;
+  var y = await modeleuser.fetchuser(email,password);
   var w = await modeleuser.fetchdoctorrequest(email);
   if(y===0 && w ===0){
 
