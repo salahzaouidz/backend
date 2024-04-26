@@ -226,7 +226,7 @@ static async doctoraccept(req,res){
 
 static async deletetempdoctor(){
     try {
-        const id = req.body.id;
+        const id = req.body.doctorID;
         var x = await modeleuser.deletetempdoctor(id);
         res.json({message:"the doctor deleted secsfully"});
     } catch (error) {
