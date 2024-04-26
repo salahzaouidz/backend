@@ -230,7 +230,7 @@ static async deletetempdoctor(){
         var x = await modeleuser.deletetempdoctor(id);
         res.json({message:"the doctor deleted secsfully"});
     } catch (error) {
-        res.json({error})
+        res.json({wrong:error});
     }
 }
 }
