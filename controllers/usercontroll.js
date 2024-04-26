@@ -10,9 +10,9 @@ class usercontrollers{
 //signup doctors
 static async signupdoctors(req,res){
 const city = req.body.address;
-const fname = req.body.firstname;
-const lname = req.body.lastname;
-const nin = req.body.nationalId;
+const fname = req.body.firstName;
+const lname = req.body.lastName;
+const nin = req.body.NIN;
 const email = req.body.email; 
 const password = req.body.confirmdPassword;
 const spec = req.body.specialty;
