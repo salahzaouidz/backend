@@ -85,7 +85,7 @@ static fetchadmin(i){
 }
  static fetchdoctorreq(){
     return new Promise ((resolve,reject) =>{
-        db.query('SELECT temp_id as doctorId,CONCAT(doctor_firstname," ",doctor_lastname) as DoctorName,email ,city as address,wilaya as providence,phone,speciality,birthdate as date,gender from doctor_temp',(err,result)=>{
+        db.query('SELECT temp_id as doctorId,CONCAT(doctor_firstname," ",doctor_lastname) as DoctorName,email ,city as address,wilaya as providence,phone,speciality as specialty,birthdate as date,gender from doctor_temp',(err,result)=>{
             //console.log("sql");
             if (err) {
     reject(err);           
