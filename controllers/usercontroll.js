@@ -197,8 +197,8 @@ try {
 static async doctoraccept(req,res){
   
     try {
-        const id = req.body.id;
-        const emergency = req.body.emergency;
+        const id = req.body.doctorID;
+        const emergency = req.body.isEmergency;
         var x = await modeleuser.getdoctortemp(id);
         const email = x[0].email;
         const password = x[0].password;
