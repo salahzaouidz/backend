@@ -259,5 +259,68 @@ resolve(true);
          });
 })
 }
+
+static addconsutable(pat,docid,consudate,consuinfo){
+    return new Promise ((resolve,reject) =>{
+        db.query('insert into consultation values(default,?,?,?,?)',[consudate,consuinfo,pat,docid],(err)=>{
+            if (err) {
+    reject(err);           
+     }
+          
+    else{
+resolve(true);
+
+    }
+
+         });
+})
+}
+
+static analysis(consid,AnalysisName,AnalysisDate,AnalysisResult){
+    return new Promise ((resolve,reject) =>{
+        db.query('insert into analyses_consu values(?,?,?,?)',[consid,AnalysisName,AnalysisResult,AnalysisDate],(err)=>{
+            if (err) {
+    reject(err);           
+     }
+          
+    else{
+resolve(true);
+
+    }
+
+         });
+})
+}
+
+static fetchconsuid(pat,docid,consudate){
+    return new Promise ((resolve,reject) =>{
+        db.query('select consultation_id from consultation where consultation_date=? and pat_id=? and doc_id=? ',[consudate,pat,docid],(err,result)=>{
+            if (err) {
+    reject(err);           
+     }
+          
+    else{
+resolve(result); 
+
+    }
+
+         });
+})
+}
+static insertmed(consid,medname){
+    return new Promise ((resolve,reject) =>{
+        db.query('insert into med_consu values(?,?)',[consid,medname],(err)=>{
+            if (err) {
+    reject(err);           
+     }
+          
+    else{
+resolve(true); 
+
+    }
+
+         });
+})
+}
  }
  module.exports = Usermodel;

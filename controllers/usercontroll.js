@@ -143,10 +143,10 @@ try {
     app.locals.userid = id; 
        switch (role) {
         case "admin": 
-        res.redirect('https://backend-medsecure.onrender.com/admin');
+        res.redirect('/admin');
             break;
         case "doctor":
-        res.redirect('https://backend-medsecure.onrender.com/doctor');
+        res.redirect('/doctor');
             break;
        }
 
@@ -233,6 +233,42 @@ static async deletetempdoctor(req,res){
         res.json({wrong:error});
     }
 }
+static async addconsultation(req,res){
+   try {
+    const analyses = req.body.analysisInputs;
+    const docid = req.body.doctorID;
+    const consudate  = req.body.consultationDate;
+    const consuinfo  = req.body.consultationSummary;
+    const med = req.body.medicaments;
+    const pat = req.body.patientID;
+    var x = await modeleuser.addconsutable(pat,docid,consudate,consuinfo);
+    x= await modeleuser.fetchconsuid(pat,docid,consudate); const consid = x[0].consultation_id;	
+    if(analyses.length>0){
+        for (let i=0;i<analyses.length;i++){
+            
+            const{AnalysisName,AnalysisDate,AnalysisResult} = analyses[i];
+           var y = await modeleuser.analysis(consid,AnalysisName,AnalysisDate,AnalysisResult); 
+           
+        }
+    }
+    if(med.length>0){
+        for(let i=0;i<med.length;i++){
+            const medname=med[i];
+        y = await modeleuser.insertmed(consid,medname);
+    }
+    }
+    res.json({message:'consultation is enregistred'});
+   } catch (error) {
+    res.json({error});
+    console.log(error);
+   }
+
+
 }
 
+
+
+
+
+}
 module.exports = usercontrollers;
