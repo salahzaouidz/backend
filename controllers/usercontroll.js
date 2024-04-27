@@ -126,7 +126,7 @@ static async getmedicaments(req,res){
 try {
    const id = app.locals.userid;
     var x = await modeleuser.fetchdoctor(id);
-const arrayBuffer = new Uint8Array(pfpUrl.data);
+const arrayBuffer = new Uint8Array(x[0].pfpUrl.data);
 const base64String = btoa(String.fromCharCode(...arrayBuffer));
 const imageUrl = `data:image/jpeg;base64,${base64String}`;
   x[0].pfpUrl = imageUrl;
