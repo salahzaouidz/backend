@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 
 
-class usercontrollers{
+class usercontrollers{ 
 
 
 //signup doctors
