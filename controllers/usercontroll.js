@@ -127,12 +127,17 @@ try {
    const id = app.locals.userid;
     var x = await modeleuser.fetchdoctor(id);
 const arrayBuffer = new Uint8Array(x[0].pfpUrl.data);
+  console.log('11111' + arrayBuffer ) ;
 const base64String = btoa(String.fromCharCode(...arrayBuffer));
+  console.log('2222' + base64String  ) ;
 const imageUrl = `data:image/jpeg;base64,${base64String}`;
+  console.log('33333' + imageUrl  ) ;
   x[0].pfpUrl = imageUrl;
+  console.log('final' + x[0].pfpUrl  ) ;
   res.json(x[0]);
 } catch (error) {
     res.json(error);
+  console.log(error);
 }
 }
 //login
