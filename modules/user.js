@@ -100,7 +100,7 @@ static fetchadmin(i){
   static fetchdoctor(id){
     return new Promise ((resolve,reject) =>{
         const a = [id];
-        db.query('SELECT doctor_id as id,doctor_firstname as firstname,doctor_lastname as lastname,user_login.email,doctor_sexe as gender,phone,doc_spes as speciality,doctor_city as address,doctor_wilaya as providence,doctor_NIN as NIN,"doctor" as role from doctors join user_login on doctors.id_user_doc=user_login.user_id where id_user_doc=?',[id],(err,result)=>{
+        db.query('SELECT doctor_id as doctorId,doctor_firstname as firstName,doctor_lastname as lastName,user_login.email,doctor_sexe as gender,phone,doc_spes as specialty,doctor_city as address,doctor_wilaya as providence,doctor_NIN as NIN,isemergency as isEmergency,"doctor" as role from doctors join user_login on doctors.id_user_doc=user_login.user_id where id_user_doc=?',[id],(err,result)=>{
             //console.log("sql");
             if (err) {
     reject(err);           
