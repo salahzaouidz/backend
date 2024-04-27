@@ -6,8 +6,6 @@ const db  = require("../util/database");
 
 static async insertdoctorstemp(email,password,city,fname,lname,nin,spec,phone,gender,doctorid,wilaya,date){
 //var values = [email , password , role];
-const today = new Date();
-const date = today.toString();
 return new Promise (resolve =>{
     db.query('insert into doctor_temp values(?,?,?,?,?,?,?,?,?,?,?,?)',[doctorid,email,password,fname,lname,city,wilaya,gender,nin,spec,phone,date],(err,result)=>{
         if (err) {
