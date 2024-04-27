@@ -12,9 +12,9 @@ static async signupdoctors(req,res){
 const city = req.body.address;
 const fname = req.body.firstName;
 const lname = req.body.lastName;
-const nin = req.body.NIN;
+const nin = req.body.nationalId;
 const email = req.body.email; 
-const password = req.body.confirmdPassword;
+const password = req.body.password;
 const spec = req.body.specialty;
 const phone= req.body.phoneNumber;
 const gender = req.body.gender;
