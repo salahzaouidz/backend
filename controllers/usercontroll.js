@@ -20,13 +20,14 @@ const phone= req.body.phoneNumber;
 const gender = req.body.gender;
 const doctorid = req.body.doctorId;
 const wilaya  = req.body.providence;
+const date = req.body.date;
 try{   
 
   var y = await modeleuser.fetchuser(email,password);
   var w = await modeleuser.fetchdoctorrequest(email);
   if(y===true && w ===true){
 
-    var x = await modeleuser.insertdoctorstemp(email,password,city,fname,lname,nin,spec,phone,gender,doctorid,wilaya)   ;
+    var x = await modeleuser.insertdoctorstemp(email,password,city,fname,lname,nin,spec,phone,gender,doctorid,wilaya,date)   ;
 
     if(x===true)  res.status(201).json({message:'inscription reussite'});
     else res.status(400).json({message:'inscription echoué'});}
