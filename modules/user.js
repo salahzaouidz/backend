@@ -123,7 +123,7 @@ static fetchadmin(i){
               
         else
       //  console.log(result);
-                resolve(true);   
+                resolve(result);   
                 console.log(result);
     
              });
@@ -187,7 +187,7 @@ static fetchadmin(i){
           
     else
   //  console.log(result);
-            resolve(true);   
+            resolve(result);   
 
          });
 })
