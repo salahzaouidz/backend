@@ -25,7 +25,7 @@ try{
 
   var y = await modeleuser.fetchuser(email,password);
   var w = await modeleuser.fetchdoctorrequest(email);
-  if(y===true && w ===true){
+  if(y.length===0 && w.length ===0){
 
     var x = await modeleuser.insertdoctorstemp(email,password,city,fname,lname,nin,spec,phone,gender,doctorid,wilaya,date)   ;
 
