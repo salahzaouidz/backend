@@ -4,7 +4,7 @@ const db  = require("../util/database");
  class Usermodel{
 
 
-static async insertdoctorstemp(email,password,city,fname,lname,nin,spec,phone,gender,doctorid,wilaya){
+static async insertdoctorstemp(email,password,city,fname,lname,nin,spec,phone,gender,doctorid,wilaya,date){
 //var values = [email , password , role];
 const today = new Date();
 const date = today.toString();
