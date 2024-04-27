@@ -127,9 +127,9 @@ try {
   const id = app.locals.userid;
   var x = await modeleuser.fetchdoctor(id);
  
-  const base64String = Buffer.from(x[0].pfpUrl).toString('base64');
-  console.log(base64String);
-  const imageUrl = `data:image/png;base64,${base64String}`;
+  //const base64String = Buffer.from(x[0].pfpUrl).toString('base64');
+  //console.log(base64String);
+  const imageUrl = `data:image/jpeg;base64,${x[0].pfpUrl}`;
   x[0].pfpUrl = imageUrl;
   res.json(x[0]);
 } catch (error) {
