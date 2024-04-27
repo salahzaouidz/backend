@@ -4,10 +4,10 @@ const db  = require("../util/database");
  class Usermodel{
 
 
-static async insertdoctorstemp(email,password,city,fname,lname,nin,spec,phone,gender,doctorid,wilaya,date){
+static async insertdoctorstemp(email,password,city,fname,lname,nin,spec,phone,gender,doctorid,wilaya,date,photo){
 //var values = [email , password , role];
 return new Promise (resolve =>{
-    db.query('insert into doctor_temp values(?,?,?,?,?,?,?,?,?,?,?,?)',[doctorid,email,password,fname,lname,city,wilaya,gender,nin,spec,phone,date],(err,result)=>{
+    db.query('insert into doctor_temp values(?,?,?,?,?,?,?,?,?,?,?,?,?)',[doctorid,email,password,fname,lname,city,wilaya,gender,nin,spec,phone,date,photo],(err,result)=>{
         if (err) {
 resolve(false);    console.log(err);        
  }
@@ -83,7 +83,7 @@ static fetchadmin(i){
 }
  static fetchdoctorreq(){
     return new Promise ((resolve,reject) =>{
-        db.query('SELECT temp_id as doctorId,CONCAT(doctor_firstname," ",doctor_lastname) as DoctorName,email ,city as address,wilaya as providence,phone,speciality as specialty,birthdate as date,gender from doctor_temp',(err,result)=>{
+        db.query('SELECT temp_id as doctorId,CONCAT(doctor_firstname," ",doctor_lastname) as DoctorName,email ,city as address,wilaya as providence,phone,speciality as specialty,birthdate as date,gender,image as pfpUrl from doctor_temp',(err,result)=>{
             //console.log("sql");
             if (err) {
     reject(err);           
@@ -100,7 +100,7 @@ static fetchadmin(i){
   static fetchdoctor(id){
     return new Promise ((resolve,reject) =>{
         const a = [id];
-        db.query('SELECT doctor_id as doctorId,doctor_firstname as firstName,doctor_lastname as lastName,user_login.email,doctor_sexe as gender,phone,doc_spes as specialty,doctor_city as address,doctor_wilaya as providence,doctor_NIN as NIN,isemergency as isEmergency,"doctor" as role from doctors join user_login on doctors.id_user_doc=user_login.user_id where id_user_doc=?',[id],(err,result)=>{
+        db.query('SELECT doctor_id as doctorId,doctor_firstname as firstName,doctor_lastname as lastName,user_login.email,doctor_sexe as gender,phone,doc_spes as specialty,doctor_city as address,doctor_wilaya as providence,doctor_NIN as NIN,isemergency as isEmergency,"doctor" as role,image as pfpUrl from doctors join user_login on doctors.id_user_doc=user_login.user_id where id_user_doc=?',[id],(err,result)=>{
             //console.log("sql");
             if (err) {
     reject(err);           
@@ -226,9 +226,9 @@ resolve(true);
 })
 }
 
- static insertdoctor(id,emergency,iduser,docfname,doctor_lastname,city,wilaya,gender,nin,speciality,phone,birthdate){
+ static insertdoctor(id,emergency,iduser,docfname,doctor_lastname,city,wilaya,gender,nin,speciality,phone,birthdate,photo){
     return new Promise ((resolve,reject) =>{
-        db.query('insert into doctors values (?,?,?,?,?,?,?,?,?,?,?,?)',[id,iduser,nin,docfname,doctor_lastname,speciality,birthdate,gender,city,wilaya,phone,emergency],(err)=>{
+        db.query('insert into doctors values (?,?,?,?,?,?,?,?,?,?,?,?,?)',[id,iduser,nin,docfname,doctor_lastname,speciality,birthdate,gender,city,wilaya,phone,emergency,photo],(err)=>{
             if (err) {
     reject(err);           
      }
