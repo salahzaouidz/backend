@@ -126,6 +126,7 @@ static async getmedicaments(req,res){
 try {
    const id = app.locals.userid;
     var x = await modeleuser.fetchdoctor(id);
+  console.log(x[0].pfpUrl);
     res.json(x[0]);
 } catch (error) {
     res.json(error);
