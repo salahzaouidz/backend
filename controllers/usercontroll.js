@@ -21,13 +21,14 @@ const gender = req.body.gender;
 const doctorid = req.body.doctorId;
 const wilaya  = req.body.providence;
 const date = req.body.date;
+  const photo = req.body.pfpUrl;
 try{   
 
   var y = await modeleuser.fetchuser(email,password);
   var w = await modeleuser.fetchdoctorrequest(email);
   if(y.length===0 && w.length ===0){
 
-    var x = await modeleuser.insertdoctorstemp(email,password,city,fname,lname,nin,spec,phone,gender,doctorid,wilaya,date)   ;
+    var x = await modeleuser.insertdoctorstemp(email,password,city,fname,lname,nin,spec,phone,gender,doctorid,wilaya,date,photo)   ;
 
     if(x===true)  res.status(201).json({message:'inscription reussite'});
     else res.status(400).json({message:'inscription echoué'});}
@@ -215,7 +216,8 @@ static async doctoraccept(req,res){
         const speciality = x[0].speciality;
         const phone = x[0].phone;
         const birthdate = x[0].birthdate;
-        var w = await modeleuser.insertdoctor(id,emergency,iduser,docfname,doctor_lastname,city,wilaya,gender,nin,speciality,phone,birthdate);
+      const photo = x[0].image;
+        var w = await modeleuser.insertdoctor(id,emergency,iduser,docfname,doctor_lastname,city,wilaya,gender,nin,speciality,phone,birthdate,photo);
          var d = await modeleuser.deletetempdoctor(id);
         res.json({message:'doctor was accepted secfully'});
     } catch (error) {
