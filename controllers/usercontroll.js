@@ -2,7 +2,8 @@
 const modeleuser = require('../modules/user');
 const express = require('express');
 const app = express();
-
+const connection  = require("../util/database");
+const transporter = require('../util/sendemails');
 
 class usercontrollers{ 
 
@@ -41,8 +42,7 @@ try{
 static async getspeciality(req,res){
 try{
     var x = await modeleuser.getspec();
-        const specialities = x.map(result => result.spes_des);
-        res.json(specialities);
+        res.json(x);
     }
 catch(error){
     console.log(error);
@@ -52,11 +52,8 @@ catch(error){
 static async getmedicaments(req,res){
     try{
         var x = await modeleuser.getmed();
-    
-            const specialities = x.map(result => result.med_name);
-            res.json(specialities);
-    
-        
+        res.json(x);
+
     }
     catch(error){
         console.log(error);}
@@ -67,8 +64,7 @@ static async getmedicaments(req,res){
      var x  = await modeleuser.fetchwilayanames();
      if(!x) {
         res.json({message:'not found'})     } else{
-            const wilaya = x.map(result => result.wilaya_name);
-            res.json(wilaya);
+          res.json(x);
         } 
    }
    catch(error){
@@ -129,8 +125,8 @@ try {
  
   //const base64String = Buffer.from(x[0].pfpUrl).toString('base64');
   //console.log(base64String);
-  const imageUrl = `data:image/jpeg;base64,${x[0].pfpUrl}`;
-  x[0].pfpUrl = imageUrl;
+  //const imageUrl = `data:image/jpeg;base64,${x[0].pfpUrl}`;
+  //x[0].pfpUrl = imageUrl;
   res.json(x[0]);
 } catch (error) {
     res.json(error);
@@ -155,6 +151,9 @@ try {
             break;
         case "doctor":
         res.redirect('/doctor');
+            break;
+        case "patient":
+            res.redirect('/patientlogin');
             break;
        }
 
@@ -191,8 +190,11 @@ try {
         if(y.length ===0) {
         var x = await modeleuser.signuppatinet(addr,email,pass,blood,height,weight,phone,providence,fname,lname,nin,gender,datebirth);
          if(!x) res.json('eroror');
-         else res.status(501).json({message:'signup secsessfuly'}); 
-
+         else {res.status(501).json({message:'signup secsessfuly'}); 
+         const i = await modeleuser.fetchidpatient(email);
+         app.locals.userid=i[0].id;
+         res.redirect('/patientlogin');
+        }
         } else return res.status(400).json({message:'this email can not be used'});
     }
 
@@ -225,7 +227,23 @@ static async doctoraccept(req,res){
       const photo = x[0].image;
         var w = await modeleuser.insertdoctor(id,emergency,iduser,docfname,doctor_lastname,city,wilaya,gender,nin,speciality,phone,birthdate,photo);
          var d = await modeleuser.deletetempdoctor(id);
-        res.json({message:'doctor was accepted secfully'});
+         const emailtext="hello "+docfname+" "+doctor_lastname+" thank you for your signup with us your account like doctor was created ! see you "
+         const mailOptions = {
+            from: '<medsecure accept> medsecuredzcontact@gmail.com', 
+            to: email,
+            subject: "accept doctor",
+            text: emailtext
+          };
+        
+          transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+              console.error('Error sending email:', error);
+              res.status(500).send('doctor was accepted and Error sending email');
+            } else {
+              console.log('Email sent:', info.response);
+              res.send('doctor was accepted and Email sent successfully');
+            }})
+
     } catch (error) {
         res.json({message:error});
         console.log(error);
@@ -274,10 +292,278 @@ static async addconsultation(req,res){
 
 
 }
+//search pateints from doctors
+static async searchpatients(req,res){
+    try {
+        const doctorId = req.body.doctorId;
+        const namepat = req.body.patientName;
+        var x = await modeleuser.getemergencydoc(doctorId);
+        var y = await modeleuser.patientsearch(namepat);
+        console.log(y[0].age);
+     // console.log(y[0].age.split('T').map(0));
+       
+        if(y.length!=0){
+            y[0].age= await modeleuser.calculerAge(y[0].age);
+        if(x[0].isemergency === 1) { //trueemergency
+             res.json(y[0]);
+        }
+        else res.json({
+            firstName:y[0].firstName,
+            lastName:y[0].lastName,
+            age:y[0].age,
+            gender:y[0].gender,
+            isPublicAccount:y[0].isPublicAccount
+        })
+    }
+    else res.json('message: patient not found');
+} catch (error) {
+        res.json('error:' + error);
+        console.log(error);
+    }
+}
+static async loginpatient(req,res){
+  try {
+    const id = app.locals.userid;
+  const x = await modeleuser.getpatientinfo(id);
+ //x[0].dateOfBirth = new Date(x[0].dateOfBirth).toISOString().split('T')[0];
+  x[0].age = await modeleuser.calculerAge(x[0].dateOfBirth);
+  //const responseObject ={} x;
+  //const responseObject = "users:" + JSON.stringify(x);
+  res.json(x[0]);
+  } catch (error) {
+    res.json(error);
+  }
+ 
+}
 
+static async fetchalergies(req,res){
+ try {
+    const patientId = req.body.patientId;
+    const email = req.body.email;
+    const y = await modeleuser.fetchidpatient(email);
+    if(y[0].id===patientId){
+    const x = await modeleuser.getalergiespatient(patientId);
+    let i = 0;
+   
+    res.json(x);
+ }
+else res.json("bad request");
+} catch (error) {
+    res.json(error);
+ }
+}
+static async fetchanalyses(req,res){
+    try {
+        const id = req.body.patientId;
+        const x = await modeleuser.fetchanalyses(id);
+        res.json(x);
+    } catch (error) {
+        res.json(error);
+    }
+}
+static async medicalhistory(req,res){
+    try {
+        const email = req.body.email;
+        const password = req.body.password;
+        var x = modeleuser.fetchuserpatient(email,password);
+        const id = x[0].idd;
 
+    } catch (error) {
+        res,json(error);
+    }
+}
+static medicalHistory (req, res)  {
+    const patientId = req.body.patientId;
+  
+    // Requête SQL pour récupérer toutes les consultations du patient
+    const consultationsQuery = `SELECT consultation_id as consultationId,consultation_date as date,consultation_details as consultationSummary,doctors.doc_spes as category,doctors.doctor_id as doctorId from consultation,doctors where consultation.doc_id=doctors.doctor_id and pat_id=?;`;
+    
+    connection.query(consultationsQuery, [patientId], (err, consultations) => {
+      if (err) {
+        console.error('Erreur lors de la récupération des consultations : ' + err.stack);
+        res.status(500).json({ error: 'Erreur lors de la récupération des consultations' });
+        return;
+      }
+  if(consultations.length===0) {res.json("non pas de consultations"); return;}
+      const medicalHistory = [];
+  
+      // Pour chaque consultation, récupérer les détails du médecin, médicaments et analyses
+      consultations.forEach((consultation) => {
+        const doctorQuery = `select concat(doctor_firstname," ",doctor_lastname) as name , phone as phoneNumber from doctors where doctor_id=?;`;
+  
+        connection.query(doctorQuery, [consultation.doctorId], (err, doctor) => {
+          if (err) {
+            console.error('Erreur lors de la récupération des détails du médecin : ' + err.stack);
+            res.status(500).json({ error: 'Erreur lors de la récupération des détails du médecin' });
+            return;
+          }
+  
+          const medicationsQuery = `SELECT medicaments.med_name as medicationName from med_consu,medicaments,consultation where med_consu.cons_id=consultation.consultation_id and med_consu.med_id=medicaments.med_id and cons_id = ?;`;
+  
+          connection.query(medicationsQuery, [consultation.consultationId], (err, medications) => {
+            if (err) {
+              console.error('Erreur lors de la récupération des médicaments : ' + err.stack);
+              res.status(500).json({ error: 'Erreur lors de la récupération des médicaments' });
+              return;
+            }
+  
+            const analysisQuery = `select concat(cons_id,"",ana_id) as analysisId ,ana_date as date,analyses.analyse_designation as name,analyse_resultat as result from analyses_consu,analyses,consultation where analyses_consu.cons_id=consultation.consultation_id and analyses_consu.ana_id=analyses.analyse_id and cons_id=?;`;
+  
+            connection.query(analysisQuery, [consultation.consultationId], (err, analysis) => {
+              if (err) {
+                console.error('Erreur lors de la récupération des analyses : ' + err.stack);
+                res.status(500).json({ error: 'Erreur lors de la récupération des analyses' });
+                return;
+              }
+  
+              // Construire l'objet de consultation avec tous les détails récupérés
+              const consultationDetails = {
+                consultationId: consultation.consultationId,
+                category: consultation.category,
+                date: consultation.date,
+                doctorName: doctor[0].name,
+                ConsultaionDetails: {
+                  consultationSummary: consultation.consultationSummary,
+                  medicaments: medications.map((medication) => medication.medicationName),
+                  doctorContact: {
+                    phoneNumber: doctor[0].phoneNumber
+                  },
+                  analysis: analysis.map((analysis) => ({
+                    Id: analysis.analysisId,
+                    date: analysis.date,
+                    name: analysis.name,
+                    result: analysis.result
+                  }))
+                }
+              };
+  
+              // Ajouter la consultation à l'historique médical
+              medicalHistory.push(consultationDetails);
+  
+              // Si c'est la dernière consultation, renvoyer l'historique médical complet
+              if (medicalHistory.length === consultations.length) {
+                const response = medicalHistory;
+                res.json( response );
+              }
+            });
+          });
+        });
+      });
+    });
+  };
+//original one
+ static  async  getMedicalHistory(req, res) {
+  
+    try {
+        const patientId = req.body.patientId;
+        const email = req.body.email;
+        const x = await modeleuser.fetchidpatient(email);
+        if(x[0].id===patientId){
+      const consultations = await modeleuser.getConsultations(patientId);
+      if (consultations.length === 0) {
+        res.json("non pas de consultations");
+        return;
+      }
+  
+      const medicalHistory = [];
+  
+      // Pour chaque consultation, récupérer les détails du médecin, médicaments et analyses
+      for (const consultation of consultations) {
+        const doctor = await modeleuser.getDoctorDetails(consultation.doctorId);
+        const medications = await modeleuser.getMedications(consultation.consultationId);
+        const analysis = await modeleuser.getAnalysis(consultation.consultationId);
+  
+        // Construire l'objet de consultation avec tous les détails récupérés
+        const consultationDetails = {
+          consultationId: consultation.consultationId,
+          category: consultation.category,
+          date: consultation.date,
+          doctorName: doctor.name,
+          ConsultaionDetails: {
+            consultationSummary: consultation.consultationSummary,
+            medicaments: medications.map((medication) => medication.medicationName),
+            doctorContact: {
+              phoneNumber: doctor.phoneNumber
+            },
+            analysis: analysis.map((analysis) => ({
+              Id: analysis.analysisId,
+              date: analysis.date,
+              name: analysis.name,
+              result: analysis.result
+            }))
+          }
+        };
+  
+        // Ajouter la consultation à l'historique médical
+        medicalHistory.push(consultationDetails);
+      }
+  
+      res.json(medicalHistory);
+   }
+  else res.json("error request");
+} catch (error) {
+      console.error('Erreur lors de la récupération de l\'historique médical : ' + error.stack);
+      res.status(500).json({ error: 'Erreur lors de la récupération de l\'historique médical' });
+    }
+  }
+  static async getalergies(req,res){
+    try {
+        var x = await modeleuser.getalergies();
+        res.json(x);
+    } catch (error) {
+        res.json(error);
+    }
+  }
 
+static async addalergy(req,res){
+    try {
+        const id =req.body.patientId;
+        const allergyName = req.body.allergyName;
+        const date = req.body.date;
+        const allergySymptoms = req.body.allergySymptoms;
+        var x = await modeleuser.addalergy(id,allergyName,date,allergySymptoms);
+    } catch (error) {
+        res.json(error);
+        console.log(error);
+    }
+}
 
+static async profilechangeacess(req,res){
+    try {
+       const patientId = req.body.patientId;
+       const email = req.body.email;
+       const profileaccess = req.body.profileaccess;
+        const x = await modeleuser.fetchidpatient(email);
+        if(x[0].id===patientId){
+            const y = await modeleuser.setprofileacess(profileaccess,patientId);
+            res.json("acess changed")
+        }
+    } catch (error) {
+        res.json({"error":error});
+    }
+}
+
+  static sendemailsnews (req, res)  {
+const email = req.body.email; 
+
+    const mailOptions = {
+      from: ' MedSecure Website', 
+      to: email,
+      subject: "Newsletter joining",
+      text: "Hi there \nWe're thrilled that you're joining our newsletter. You'll receive updates every week. \nThank you\nMedsecure Support"
+    };
+  
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        res.status(500).send('Error sending email');
+      } else {
+        console.log('Email sent:', info.response);
+        res.send('Email sent successfully');
+      }
+    });
+  };
+  
 
 }
 module.exports = usercontrollers;

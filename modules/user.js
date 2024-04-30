@@ -22,7 +22,7 @@ else
 // fonction get spec
 static getspec(){
     return new Promise ((resolve,reject) =>{
-        db.query('select spes_des from spesialite',(err,result)=>{
+        db.query('select id_spes as id,spes_des as name from spesialite',(err,result)=>{
             if (err) {
     reject(err);            
      }
@@ -37,7 +37,7 @@ static getspec(){
  //getmedicaments names
 static getmed(){
     return new Promise ((resolve,reject) =>{
-        db.query('select med_name from medicaments',(err,result)=>{
+        db.query('select med_id as id , med_name as name from medicaments',(err,result)=>{
             //console.log("sql");
             if (err) {
     reject(false);    console.log(err);        
@@ -50,12 +50,12 @@ static getmed(){
    // db.end();
 })    
 }
-  static fetchwilayanames(){
+static fetchwilayanames(){
     return new Promise ((resolve,reject) =>{
-        db.query('select wilaya_name from wilaya',(err,result)=>{
+        db.query('select wilaya_id as id ,wilaya_name as name from wilaya',(err,result)=>{
             //console.log("sql");
             if (err) {
-    reject(false);    console.log(err);        
+    reject(err);    console.log(err);        
      }
           
     else
@@ -81,9 +81,9 @@ static fetchadmin(i){
 })
     
 }
- static fetchdoctorreq(){
+static fetchdoctorreq(){
     return new Promise ((resolve,reject) =>{
-        db.query('SELECT temp_id as doctorId,CONCAT(doctor_firstname," ",doctor_lastname) as DoctorName,email ,city as address,wilaya as providence,phone,speciality as specialty,birthdate as date,gender,image as pfpUrl from doctor_temp',(err,result)=>{
+        db.query('SELECT temp_id as doctorId,CONCAT(doctor_firstname," ",doctor_lastname) as DoctorName,email ,city as address,wilaya as providence,phone,speciality as specialty,DATE_FORMAT(datesignup, "%Y-%m-%d") as date,gender,image as pfpUrl from doctor_temp',(err,result)=>{
             //console.log("sql");
             if (err) {
     reject(err);           
@@ -97,7 +97,7 @@ static fetchadmin(i){
 })
 
  }
-  static fetchdoctor(id){
+static fetchdoctor(id){
     return new Promise ((resolve,reject) =>{
         const a = [id];
         db.query('SELECT doctor_id as doctorId,doctor_firstname as firstName,doctor_lastname as lastName,user_login.email,doctor_sexe as gender,phone,doc_spes as specialty,doctor_city as address,doctor_wilaya as providence,doctor_NIN as NIN,isemergency as isEmergency,"doctor" as role,image as pfpUrl from doctors join user_login on doctors.id_user_doc=user_login.user_id where id_user_doc=?',[id],(err,result)=>{
@@ -113,7 +113,7 @@ static fetchadmin(i){
          });
 })
   }
-    static fetchuser(email,password){
+static fetchuser(email,password){
         return new Promise ((resolve,reject) =>{
             db.query('select user_id as id,role from user_login where email=? and password=?',[email,password],(err,result)=>{
                 //console.log("sql");
@@ -132,7 +132,7 @@ static fetchadmin(i){
 
     }
    
-       static signuppatinet(addr,email,pass,blood,height,weight,phone,providence,fname,lname,nin,gender,datebirth){
+static signuppatinet(addr,email,pass,blood,height,weight,phone,providence,fname,lname,nin,gender,datebirth){
         return new Promise ((resolve,reject) =>{
             db.query('INSERT into user_login (email,password,role) VALUES (?,?,"patient");',[email,pass],(err,result)=>{
                 if (err) {
@@ -159,7 +159,7 @@ static fetchadmin(i){
         });
 
        }
-       static fetchuserpatient(email,pass){
+static fetchuserpatient(email,pass){
         return new Promise ((resolve,reject) =>{
             db.query('select user_id as idd from user_login where email=? and password=?',[email,pass],(err,result)=>{
                 //console.log("sql");
@@ -177,7 +177,7 @@ static fetchadmin(i){
 
 
     }
-  static fetchdoctorrequest(email){
+static fetchdoctorrequest(email){
     return new Promise ((resolve,reject) =>{
         db.query('SELECT * from doctor_temp where email=?',[email],(err,result)=>{
             //console.log("sql");
@@ -194,7 +194,7 @@ static fetchadmin(i){
   }
     
   
- static getdoctortemp(id){
+static getdoctortemp(id){
     return new Promise ((resolve,reject) =>{
         db.query('SELECT * from doctor_temp where temp_id=?',[id],(err,result)=>{
             if (err) {
@@ -320,5 +320,199 @@ resolve(true);
          });
 })
 }
+static getemergencydoc(doctorId){
+    return new Promise ((resolve,reject) =>{
+        db.query('select isemergency from doctors where doctor_id=?',[doctorId],(err,res)=>{
+            if (err) {
+    reject(err);           
+     }    
+    else{
+resolve(res);
+    }
+         });
+}) 
+}
+static patientsearch(patname){
+    return new Promise ((resolve,reject) =>{
+        db.query('select patient_id as patientId,patient_firstname as firstName , patient_lastname as lastName, DATE_FORMAT(patient_dateb, "%Y-%m-%d") as age , patient_sexe as gender ,patient_photo as pfpUrl, profileaccess as isPublicAccount from patients where concat(patient_firstname," ",patient_lastname)=?;',[patname],(err,res)=>{
+            if (err) {
+    reject(err);           
+     }    
+    else{
+resolve(res);
+    }
+         });
+}) 
+}
+static getpatientinfo(id){
+    return new Promise ((resolve,reject) =>{
+        db.query('select patient_id as id,patient_firstname as firstName,patient_lastname as lastName,patient_height as height,patient_weight as weight, patient_bloodtype as bloodType , DATE_FORMAT(patient_dateb, "%Y-%m-%d") as dateOfBirth,user_login.email as email , patients.phone as phone , 00 as age ,patient_sexe as gender,patient_city as address,patient_wilaya as providence ,"patient" as role , patient_photo as pfpUrl from patients,user_login where patients.patient_id=user_login.user_id and patient_id=?;',[id],(err,res)=>{
+            if (err) {
+    reject(err);           
+     }    
+    else{
+resolve(res);
+    }
+         });
+}) 
+
+}
+static getalergiespatient(patientId){
+    return new Promise ((resolve,reject) =>{
+        db.query('SELECT alergies.aler_name as name , aler_note as symptoms ,DATE_FORMAT(alerdate , "%Y-%m-%d %H:%i:%s")as date from alergies_patient,alergies where alergies_patient.idaler=alergies.aler_id and idpat=? ORDER by date DESC;',[patientId],(err,res)=>{
+            if (err) {
+    reject(err);           
+     }    
+    else{
+resolve(res);
+    }
+         });
+}) 
+}
+static fetchanalyses(id){
+    return new Promise ((resolve,reject) =>{
+        db.query('SELECT concat(cons_id,ana_id) as analysisId ,DATE_FORMAT(ana_date, "%Y-%m-%d %H:%i:%s") as date,analyses.analyse_designation as analysisName,concat(doctors.doctor_firstname," ",doctors.doctor_lastname) as doctor,analyse_resultat as comments from analyses_consu,analyses,consultation,doctors where analyses_consu.ana_id=analyses.analyse_id and analyses_consu.cons_id=consultation.consultation_id and consultation.doc_id=doctors.doctor_id and consultation.pat_id=?;',[id],(err,res)=>{
+            if (err) {
+    reject(err);           
+     }    
+    else{
+resolve(res);
+    }
+         });
+})  
+}
+static getConsultations(patientId) {
+    return new Promise((resolve, reject) => {
+      const query = `SELECT consultation_id as consultationId, DATE_FORMAT(consultation_date,"%Y-%m-%d") as date, consultation_details as consultationSummary, doctors.doc_spes as category, doctors.doctor_id as doctorId FROM consultation, doctors WHERE consultation.doc_id = doctors.doctor_id AND pat_id = ?`; 
+      db.query(query, [patientId], (err, consultations) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+  
+        resolve(consultations);
+      });
+    });
+  }
+  
+  // Fonction pour récupérer les détails d'un médecin
+  static getDoctorDetails(doctorId) {
+    return new Promise((resolve, reject) => {
+      const query = `SELECT CONCAT(doctor_firstname, " ", doctor_lastname) as name, phone as phoneNumber FROM doctors WHERE doctor_id = ?`;
+  
+      db.query(query, [doctorId], (err, doctor) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+  
+        resolve(doctor[0]);
+      });
+    });
+  }
+  
+  // Fonction pour récupérer les médicaments d'une consultation
+  static getMedications(consultationId) {
+    return new Promise((resolve, reject) => {
+      const query = `SELECT medicaments.med_name as medicationName FROM med_consu, medicaments WHERE med_consu.cons_id = ? AND med_consu.med_id = medicaments.med_id`;
+  
+      db.query(query, [consultationId], (err, medications) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+  
+        resolve(medications);
+      });
+    });
+  }
+  
+  // Fonction pour récupérer les analyses d'une consultation
+  static getAnalysis(consultationId) {
+    return new Promise((resolve, reject) => {
+      const query = `SELECT CONCAT(cons_id, "", ana_id) as analysisId, ana_date as date, analyses.analyse_designation as name, analyse_resultat as result FROM analyses_consu, analyses WHERE analyses_consu.cons_id = ? AND analyses_consu.ana_id = analyses.analyse_id`;
+  
+      db.query(query, [consultationId], (err, analysis) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+  
+        resolve(analysis);
+      });
+    });
+  }
+
+ static fetchidpatient(email){
+    return new Promise((resolve, reject) => {
+        const query = `select user_id as id from user_login where email=?`;
+    
+        db.query(query, [email], (err, result) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+    
+          resolve(result);
+        });
+      });
+ } 
+static getalergies(){
+    return new Promise((resolve, reject) => {
+        const query = `select aler_id as id,aler_name as name from alergies`;
+    
+        db.query(query, (err, result) => {
+          if (err) {
+            reject(err);
+          }
+    
+          resolve(result);
+        });
+      });
+}
+static addalergy(id,allergyName,date,allergySymptoms){
+    return new Promise((resolve, reject) => {
+        const query = `insert into alergies_patient values(?,?,?,?)`;
+    
+        db.query(query,[id,allergyName,date,allergySymptoms], (err, result) => {
+          if (err) {
+            reject(err);
+          }
+    
+          resolve(result);
+        });
+      });
+}
+static setprofileacess(profileaccess,patientId){
+    return new Promise((resolve, reject) => {
+        const query = `update patients set profileaccess=? where patient_id=?;`;
+    
+        db.query(query,[profileaccess,patientId], (err, result) => {
+          if (err) {
+            reject(err);
+          }
+    
+          resolve(result);
+        });
+      });
+}
+static calculerAge(dateNaissanceStr) {
+    // Diviser la chaîne de caractères en jour, mois et année
+   //const [annee, mois, jour] = dateNaissanceStr;//.split('-').map(Number);annee, mois - 1, jour
+  
+    // Créer un objet Date à partir de la chaîne de caractères
+    const dateNaissance = new Date(dateNaissanceStr); // Mois - 1 car les mois sont indexés à partir de 0
+  
+    // Obtenir la date actuelle
+    const dateActuelle = new Date();
+  
+    // Calculer la différence entre les deux dates en millisecondes
+    const differenceMs = dateActuelle - dateNaissance;
+  
+    // Convertir la différence de millisecondes en années
+    const age = Math.floor(differenceMs / (1000 * 60 * 60 * 24 * 365));
+  
+    return age;
+  }
  }
  module.exports = Usermodel;

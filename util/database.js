@@ -8,7 +8,7 @@ password: 'Vtc4kC*UaC%c6C7'
 
 
 });
-pool.getConnection((err)=>{
+pool.getConnection((err)=>{    
     if(!err)
     console.log("database connected")  ; 
 })
