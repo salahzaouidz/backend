@@ -59,9 +59,9 @@ static async getmedicaments(req,res){
         console.log(error);}
 }
 // getwilayanames
- static async getwilayanames(req,res){
+ static async getanalyses(req,res){
    try {
-     var x  = await modeleuser.fetchwilayanames();
+     var x  = await modeleuser.fetchanalysesname();
      if(!x) {
         res.json({message:'not found'})     } else{
           res.json(x);
@@ -171,7 +171,7 @@ try {
     const addr = req.body.address;
     const blood = req.body.bloodType;
     const pass = req.body.password;
-    const datebirth = req.body.dateofBirth;
+    const datebirth = req.body.dateOfBirth;
     const email = req.body.email;
     const gender = req.body.gender;
     const fname = req.body.firstName;
@@ -184,13 +184,14 @@ try {
     const agreeToPrivacy = req.body.agreeToPrivacy;
     const agreeToTerms = req.body.agreeToTerms;
     const confpasw = req.body.confirmPassword;
-    if(agreeToPrivacy==='true' && agreeToTerms==='true' && pass===confpasw){
+    const pfpUrl = req.body.pfpUrl;
+    if(agreeToPrivacy===true && agreeToTerms===true && pass===confpasw){
         //exsit of patient
         var y = await modeleuser.fetchuser(email,pass); console.log(y);
         if(y.length ===0) {
-        var x = await modeleuser.signuppatinet(addr,email,pass,blood,height,weight,phone,providence,fname,lname,nin,gender,datebirth);
+        var x = await modeleuser.signuppatinet(addr,email,pass,blood,height,weight,phone,providence,fname,lname,nin,gender,datebirth,pfpUrl);
          if(!x) res.json('eroror');
-         else {res.status(501).json({message:'signup secsessfuly'}); 
+         else {//res.status(501).json({message:'signup secsessfuly'}); 
          const i = await modeleuser.fetchidpatient(email);
          app.locals.userid=i[0].id;
          res.redirect('/patientlogin');
@@ -295,24 +296,24 @@ static async addconsultation(req,res){
 //search pateints from doctors
 static async searchpatients(req,res){
     try {
-        const doctorId = req.body.doctorId;
+        //const doctorId = req.body.doctorId;
         const namepat = req.body.patientName;
-        var x = await modeleuser.getemergencydoc(doctorId);
+        //var x = await modeleuser.getemergencydoc(doctorId);
         var y = await modeleuser.patientsearch(namepat);
         console.log(y[0].age);
      // console.log(y[0].age.split('T').map(0));
        
         if(y.length!=0){
             y[0].age= await modeleuser.calculerAge(y[0].age);
-        if(x[0].isemergency === 1) { //trueemergency
-             res.json(y[0]);
-        }
-        else res.json({
+      
+         res.json({
             firstName:y[0].firstName,
             lastName:y[0].lastName,
             age:y[0].age,
             gender:y[0].gender,
-            isPublicAccount:y[0].isPublicAccount
+            isPublicAccount:y[0].isPublicAccount,
+            pfpUrl:y[0].pfpUrl,
+            email:y[0].email
         })
     }
     else res.json('message: patient not found');
@@ -536,15 +537,50 @@ static async profilechangeacess(req,res){
         const x = await modeleuser.fetchidpatient(email);
         if(x[0].id===patientId){
             const y = await modeleuser.setprofileacess(profileaccess,patientId);
-            res.json("acess changed")
-        }
+            res.json({isPublicAccount:profileaccess});
+        } else res.json('error de security')
     } catch (error) {
         res.json({"error":error});
+        console.log(error);
     }
 }
+static async getprofilestatus(req,res){
+  try {
+    const patientId = req.body.patientId;
+    const email = req.body.email;
+    const x = await modeleuser.fetchidpatient(email);
+        if(x[0].id===patientId){
+          var y = await modeleuser.getprofileaccess(patientId);  
+          res.json(y[0]);          
+        }
+    else res.json("error de secirity");
+  } catch (error) {
+    res.json(error);
+    console.log(error);
+  }
+}
 
-  static sendemailsnews (req, res)  {
+static async viewprofile(req,res){
+  try {
+    const id = req.body.patientId;
+    const email = req.body.email;
+    const x = await modeleuser.fetchidpatient(email);
+        if(x[0].id===id){
+             app.locals.userid = id;
+             res.redirect('/patientlogin');
+        }
+  } catch (error) {
+    
+  }
+}
+
+  static async sendemailsnews (req, res)  {
 const email = req.body.email; 
+try{
+var x = await modeleuser.insertemailnews(email);}
+catch (error){
+  res.json(error);
+}
 
     const mailOptions = {
       from: ' MedSecure Website', 

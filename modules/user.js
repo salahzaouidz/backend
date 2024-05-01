@@ -50,9 +50,9 @@ static getmed(){
    // db.end();
 })    
 }
-static fetchwilayanames(){
+static fetchanalysesname(){
     return new Promise ((resolve,reject) =>{
-        db.query('select wilaya_id as id ,wilaya_name as name from wilaya',(err,result)=>{
+        db.query('select analyse_id as id,analyse_designation as name from analyses;',(err,result)=>{
             //console.log("sql");
             if (err) {
     reject(err);    console.log(err);        
@@ -132,7 +132,7 @@ static fetchuser(email,password){
 
     }
    
-static signuppatinet(addr,email,pass,blood,height,weight,phone,providence,fname,lname,nin,gender,datebirth){
+static signuppatinet(addr,email,pass,blood,height,weight,phone,providence,fname,lname,nin,gender,datebirth,pfpUrl){
         return new Promise ((resolve,reject) =>{
             db.query('INSERT into user_login (email,password,role) VALUES (?,?,"patient");',[email,pass],(err,result)=>{
                 if (err) {
@@ -143,7 +143,7 @@ static signuppatinet(addr,email,pass,blood,height,weight,phone,providence,fname,
                         .then((xx) => {
 
                             const id = xx[0].idd; // Assuming the query result gives an array with at least one element
-                            db.query('INSERT into patients VALUES (?,?,?,?,?,?,?,?,?,?,?,?,"0")',[id,nin,fname,lname,datebirth,gender,addr,providence,height,weight,blood,phone],(err,result)=>{
+                            db.query('INSERT into patients VALUES (?,?,?,?,?,?,?,?,?,?,?,?,"0",?)',[id,nin,fname,lname,datebirth,gender,addr,providence,height,weight,blood,phone,pfpUrl],(err,result)=>{
                                 if (err) {
                                     reject(err);
                                 } else {
@@ -334,7 +334,7 @@ resolve(res);
 }
 static patientsearch(patname){
     return new Promise ((resolve,reject) =>{
-        db.query('select patient_id as patientId,patient_firstname as firstName , patient_lastname as lastName, DATE_FORMAT(patient_dateb, "%Y-%m-%d") as age , patient_sexe as gender ,patient_photo as pfpUrl, profileaccess as isPublicAccount from patients where concat(patient_firstname," ",patient_lastname)=?;',[patname],(err,res)=>{
+        db.query('select patient_id as patientId,patient_firstname as firstName , patient_lastname as lastName, DATE_FORMAT(patient_dateb, "%Y-%m-%d") as age , patient_sexe as gender ,patient_photo as pfpUrl, profileaccess as isPublicAccount,user_login.email as email from patients,user_login where patients.patient_id=user_login.user_id and concat(patient_firstname," ",patient_lastname)=?;',[patname],(err,res)=>{
             if (err) {
     reject(err);           
      }    
@@ -359,7 +359,7 @@ resolve(res);
 }
 static getalergiespatient(patientId){
     return new Promise ((resolve,reject) =>{
-        db.query('SELECT alergies.aler_name as name , aler_note as symptoms ,DATE_FORMAT(alerdate , "%Y-%m-%d %H:%i:%s")as date from alergies_patient,alergies where alergies_patient.idaler=alergies.aler_id and idpat=? ORDER by date DESC;',[patientId],(err,res)=>{
+        db.query('SELECT alergies.aler_name as name , aler_note as symptoms ,DATE_FORMAT(alerdate , "%Y-%m-%d @ %H:%i")as date from alergies_patient,alergies where alergies_patient.idaler=alergies.aler_id and idpat=? ORDER by date DESC;',[patientId],(err,res)=>{
             if (err) {
     reject(err);           
      }    
@@ -371,7 +371,7 @@ resolve(res);
 }
 static fetchanalyses(id){
     return new Promise ((resolve,reject) =>{
-        db.query('SELECT concat(cons_id,ana_id) as analysisId ,DATE_FORMAT(ana_date, "%Y-%m-%d %H:%i:%s") as date,analyses.analyse_designation as analysisName,concat(doctors.doctor_firstname," ",doctors.doctor_lastname) as doctor,analyse_resultat as comments from analyses_consu,analyses,consultation,doctors where analyses_consu.ana_id=analyses.analyse_id and analyses_consu.cons_id=consultation.consultation_id and consultation.doc_id=doctors.doctor_id and consultation.pat_id=?;',[id],(err,res)=>{
+        db.query('SELECT concat(cons_id,ana_id) as analysisId ,DATE_FORMAT(ana_date, "%Y-%m-%d @ %H:%i") as date,analyses.analyse_designation as analysisName,concat(doctors.doctor_firstname," ",doctors.doctor_lastname) as doctor,analyse_resultat as comments from analyses_consu,analyses,consultation,doctors where analyses_consu.ana_id=analyses.analyse_id and analyses_consu.cons_id=consultation.consultation_id and consultation.doc_id=doctors.doctor_id and consultation.pat_id=?;',[id],(err,res)=>{
             if (err) {
     reject(err);           
      }    
@@ -430,7 +430,7 @@ static getConsultations(patientId) {
   // Fonction pour récupérer les analyses d'une consultation
   static getAnalysis(consultationId) {
     return new Promise((resolve, reject) => {
-      const query = `SELECT CONCAT(cons_id, "", ana_id) as analysisId, ana_date as date, analyses.analyse_designation as name, analyse_resultat as result FROM analyses_consu, analyses WHERE analyses_consu.cons_id = ? AND analyses_consu.ana_id = analyses.analyse_id`;
+      const query = `SELECT CONCAT(cons_id, "", ana_id) as analysisId, DATE_FORMAT(ana_date, "%Y-%m-%d @ %H:%i") as date, analyses.analyse_designation as name, analyse_resultat as result FROM analyses_consu, analyses WHERE analyses_consu.cons_id = ? AND analyses_consu.ana_id = analyses.analyse_id`;
   
       db.query(query, [consultationId], (err, analysis) => {
         if (err) {
@@ -496,6 +496,33 @@ static setprofileacess(profileaccess,patientId){
         });
       });
 }
+static getprofileaccess(patientId){
+  return new Promise((resolve, reject) => {
+    const query = `select profileaccess as isPublicAccount from patients WHERE patient_id=?;`;
+
+    db.query(query,[patientId], (err, result) => {
+      if (err) {
+        reject(err);
+      }
+
+      resolve(result);
+    });
+  });
+}
+static insertemailnews(email){
+  return new Promise((resolve, reject) => {
+    const query = `insert into newslatteremails values(default,?)`;
+
+    db.query(query,[email], (err, result) => {
+      if (err) {
+        reject(err);
+      }
+
+      resolve(result);
+    });
+  });
+}
+
 static calculerAge(dateNaissanceStr) {
     // Diviser la chaîne de caractères en jour, mois et année
    //const [annee, mois, jour] = dateNaissanceStr;//.split('-').map(Number);annee, mois - 1, jour
