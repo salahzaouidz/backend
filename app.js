@@ -14,7 +14,7 @@ app.use(express.json({ limit: '20mb' }));
 // Increase the limit for URL-encoded requests
 app.use(express.urlencoded({ limit: '20mb', extended: true }));
 app.use(session({  //for global variable and send data from midlware to other midlware
-secret :'a',
+secret :'aaaaaaaaaaaaa',
 resave : false,
 saveUninitialized : false
 }));

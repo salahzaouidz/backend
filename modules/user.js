@@ -83,7 +83,7 @@ static fetchadmin(i){
 }
 static fetchdoctorreq(){
     return new Promise ((resolve,reject) =>{
-        db.query('SELECT temp_id as doctorId,CONCAT(doctor_firstname," ",doctor_lastname) as DoctorName,email ,city as address,wilaya as providence,phone,speciality as specialty,DATE_FORMAT(datesignup, "%Y-%m-%d") as date,gender,image as pfpUrl from doctor_temp',(err,result)=>{
+        db.query('SELECT temp_id as doctorId,CONCAT(doctor_firstname," ",doctor_lastname) as DoctorName,email ,city as address,wilaya as providence,phone,spesialite.spes_des as specialty,DATE_FORMAT(datesignup, "%Y-%m-%d") as date,gender,image as pfpUrl from doctor_temp,spesialite where doctor_temp.speciality=spesialite.id_spes;',(err,result)=>{
             //console.log("sql");
             if (err) {
     reject(err);           
@@ -100,7 +100,7 @@ static fetchdoctorreq(){
 static fetchdoctor(id){
     return new Promise ((resolve,reject) =>{
         const a = [id];
-        db.query('SELECT doctor_id as doctorId,doctor_firstname as firstName,doctor_lastname as lastName,user_login.email,doctor_sexe as gender,phone,doc_spes as specialty,doctor_city as address,doctor_wilaya as providence,doctor_NIN as NIN,isemergency as isEmergency,"doctor" as role,image as pfpUrl from doctors join user_login on doctors.id_user_doc=user_login.user_id where id_user_doc=?',[id],(err,result)=>{
+        db.query('SELECT doctor_id as doctorId,doctor_firstname as firstName,doctor_lastname as lastName,user_login.email,doctor_sexe as gender,phone,spesialite.spes_des as specialty,doctor_city as address,doctor_wilaya as providence,doctor_NIN as NIN,isemergency as isEmergency,"doctor" as role,image as pfpUrl from doctors,user_login,spesialite where doctors.id_user_doc=user_login.user_id and doctors.doc_spes=spesialite.id_spes and id_user_doc=?;',[id],(err,result)=>{
             //console.log("sql");
             if (err) {
     reject(err);           
@@ -258,9 +258,9 @@ resolve(true);
 })
 }
 
-static addconsutable(pat,docid,consudate,consuinfo){
+static addconsutable(pat,docid,consudate,consuinfo,maladie){
     return new Promise ((resolve,reject) =>{
-        db.query('insert into consultation values(default,?,?,?,?)',[consudate,consuinfo,pat,docid],(err)=>{
+        db.query('insert into consultation values(default,?,?,?,?,?)',[consudate,consuinfo,maladie,pat,docid],(err)=>{
             if (err) {
     reject(err);           
      }
@@ -383,7 +383,7 @@ resolve(res);
 }
 static getConsultations(patientId) {
     return new Promise((resolve, reject) => {
-      const query = `SELECT consultation_id as consultationId, DATE_FORMAT(consultation_date,"%Y-%m-%d") as date, consultation_details as consultationSummary, doctors.doc_spes as category, doctors.doctor_id as doctorId FROM consultation, doctors WHERE consultation.doc_id = doctors.doctor_id AND pat_id = ?`; 
+      const query = `SELECT consultation_id as consultationId, DATE_FORMAT(consultation_date,"%Y-%m-%d") as date, consultation_details as consultationSummary,consultation_maladie as maladie,doctors.doc_spes as category, doctors.doctor_id as doctorId FROM consultation, doctors WHERE consultation.doc_id = doctors.doctor_id AND pat_id = ?`; 
       db.query(query, [patientId], (err, consultations) => {
         if (err) {
           reject(err);
@@ -523,6 +523,78 @@ static insertemailnews(email){
   });
 }
 
+static getmaladies(){
+  return new Promise((resolve, reject) => {
+    const query = `SELECT maladie_id as id , maladie_name as name from specialMaladies;`;
+
+    db.query(query, (err, result) => {
+      if (err) {
+        reject(err);
+      }
+
+      resolve(result);
+    });
+  });
+}
+
+static getoperations(){
+  return new Promise((resolve, reject) => {
+    const query = `SELECT operid as id,opername as name from operations;`;
+
+    db.query(query, (err, result) => {
+      if (err) {
+        reject(err);
+      }
+
+      resolve(result);
+    });
+  });
+}
+static setopertaionspatient(patientId,name,details,doctorId,date){
+  const query = `INSERT into patient_operations values(?,?,?,?,?);`;
+
+  db.query(query,[patientId,name,doctorId,details,date], (err, result) => {
+    if (err) {
+      reject(err);
+    }
+
+    resolve(result);
+  });
+};
+
+static setspecmaladies(patientId,name,details,doctorId,date){
+  const query = `INSERT into patient_specmaladies values(?,?,?,?,?);`;
+
+  db.query(query,[patientId,name,date,details,doctorId], (err, result) => {
+    if (err) {
+      reject(err);
+    }
+
+    resolve(result);
+  });
+}
+static fetchopeartionspatients(id){
+  const query = `select operations.opername as name , oper_details as details,concat(doctors.doctor_firstname," ",doctors.doctor_lastname) as doctorName , oper_date as date from patient_operations,operations,doctors where patient_operations.oper_id=operations.operid and patient_operations.doc_id=doctors.doctor_id and pat_id=?;`;
+
+  db.query(query,[id], (err, result) => {
+    if (err) {
+      reject(err);
+    }
+
+    resolve(result);
+  });
+}
+static fetchspecmaladiespatients(id){
+  const query = `SELECT specialMaladies.maladie_name as name,maladie_details as details,concat(doctors.doctor_firstname," ",doctors.doctor_lastname) as doctorName,maladie_date as date from patient_specmaladies,specialMaladies,doctors where patient_specmaladies.maladie_id=specialMaladies.maladie_id and patient_specmaladies.doc_id=doctors.doctor_id and pat_id=?;`;
+
+  db.query(query,[id], (err, result) => {
+    if (err) {
+      reject(err);
+    }
+
+    resolve(result);
+  });
+}
 static calculerAge(dateNaissanceStr) {
     // Diviser la chaîne de caractères en jour, mois et année
    //const [annee, mois, jour] = dateNaissanceStr;//.split('-').map(Number);annee, mois - 1, jour
