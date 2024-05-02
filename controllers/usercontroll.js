@@ -73,7 +73,7 @@ static async getmedicaments(req,res){
 }
 //adminlogin
   static async getadmin(req,res){
-  const i =req.session.userid; console.log(i);
+  const i =app.locals.userid; console.log(i);
     try{
       var x = await modeleuser.fetchadmin(i);
       if(!x) res.json({message:'not found'});
@@ -120,7 +120,7 @@ static async getmedicaments(req,res){
 //logindoctor
   static async logindoctor(req,res){
 try {
-  const id = req.session.userid;
+  const id = app.locals.userid;
   var x = await modeleuser.fetchdoctor(id);
  
   res.json(x[0]);
@@ -141,7 +141,7 @@ try {
      const id = x[0].id; 
     const  role = x[0].role;
    // app.locals.userid = id;
-    req.session.userid=id;
+    app.locals.userid=id;
     console.log(req.session.userid);
        switch (role) {
         case "admin": 
@@ -325,7 +325,7 @@ static async searchpatients(req,res){
 static async loginpatient(req,res){
   try {
    // const id = app.locals.userid;
-   const id = req.session.userid;
+   const id = app.locals.userid;
    
     console.log(id);
   const x = await modeleuser.getpatientinfo(id);
