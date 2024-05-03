@@ -494,7 +494,7 @@ static async viewprofile(req,res){
     const email = req.body.email;
     const x = await modeleuser.fetchidpatient(email);
         if(x[0].id===id){
-             req.session.userid = id;
+             app.locals.userid = id;
              res.redirect('/patientlogin');
         }
   } catch (error) {
