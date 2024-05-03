@@ -4,6 +4,8 @@ const cors = require('cors');
 const app = express();
 const users  = require('./routes/route')
 const bodyParser = require('body-parser')
+
+app.use(cors());
 // Parse URL-encoded bodies (as sent by HTML forms)
 app.use(bodyParser.json({ limit: '20mb' }))
 
@@ -21,7 +23,7 @@ saveUninitialized : false
 app.use(users);  //endpoints start
 
 
-app.use(cors());
+
 
 
 
