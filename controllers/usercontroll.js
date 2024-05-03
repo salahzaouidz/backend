@@ -549,7 +549,7 @@ static async getoperationspatients(req,res){
     const x = await modeleuser.fetchidpatient(email);
         if(x[0].id===id){
           const y = await modeleuser.fetchopeartionspatients(id);   
-          res.json(x);
+          res.json(y);
         } else res.json([]);
   } catch (error) {
     res.json(error);
@@ -562,7 +562,7 @@ static async getspecmaladiespatients(req,res){
     const x = await modeleuser.fetchidpatient(email);
         if(x[0].id===id){
           const y = await modeleuser.fetchspecmaladiespatients(id);   
-          res.json(x);
+          res.json(y);
         } else res.json([]);
   } catch (error) {
     res.json(error);
