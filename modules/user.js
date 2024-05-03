@@ -551,7 +551,8 @@ static getoperations(){
   });
 }
 static setopertaionspatient(patientId,name,details,doctorId,date){
-  const query = `INSERT into patient_operations values(?,?,?,?,?);`;
+  return new Promise((resolve, reject) => {
+ const query = `INSERT into patient_operations values(?,?,?,?,?);`;
 
   db.query(query,[patientId,name,doctorId,details,date], (err, result) => {
     if (err) {
@@ -560,10 +561,12 @@ static setopertaionspatient(patientId,name,details,doctorId,date){
 
     resolve(result);
   });
+  });
 };
 
 static setspecmaladies(patientId,name,details,doctorId,date){
-  const query = `INSERT into patient_specmaladies values(?,?,?,?,?);`;
+  return new Promise((resolve, reject) => {
+ const query = `INSERT into patient_specmaladies values(?,?,?,?,?);`;
 
   db.query(query,[patientId,name,date,details,doctorId], (err, result) => {
     if (err) {
@@ -572,9 +575,11 @@ static setspecmaladies(patientId,name,details,doctorId,date){
 
     resolve(result);
   });
+  });
 }
 static fetchopeartionspatients(id){
-  const query = `select operations.opername as name , oper_details as details,concat(doctors.doctor_firstname," ",doctors.doctor_lastname) as doctorName , oper_date as date from patient_operations,operations,doctors where patient_operations.oper_id=operations.operid and patient_operations.doc_id=doctors.doctor_id and pat_id=?;`;
+  return new Promise((resolve, reject) => {
+ const query = `select operations.opername as name , oper_details as details,concat(doctors.doctor_firstname," ",doctors.doctor_lastname) as doctorName ,DATE_FORMAT(oper_date,"%Y-%m-%d @ %H:%i") as date from patient_operations,operations,doctors where patient_operations.oper_id=operations.operid and patient_operations.doc_id=doctors.doctor_id and pat_id=?;`;
 
   db.query(query,[id], (err, result) => {
     if (err) {
@@ -582,10 +587,12 @@ static fetchopeartionspatients(id){
     }
 
     resolve(result);
+  });
   });
 }
 static fetchspecmaladiespatients(id){
-  const query = `SELECT specialMaladies.maladie_name as name,maladie_details as details,concat(doctors.doctor_firstname," ",doctors.doctor_lastname) as doctorName,maladie_date as date from patient_specmaladies,specialMaladies,doctors where patient_specmaladies.maladie_id=specialMaladies.maladie_id and patient_specmaladies.doc_id=doctors.doctor_id and pat_id=?;`;
+ return new Promise((resolve, reject) => {
+ const query = `SELECT specialMaladies.maladie_name as name,maladie_details as details,concat(doctors.doctor_firstname," ",doctors.doctor_lastname) as doctorName,DATE_FORMAT(maladie_date,"%Y-%m-%d @ %H:%i") as date from patient_specmaladies,specialMaladies,doctors where patient_specmaladies.maladie_id=specialMaladies.maladie_id and patient_specmaladies.doc_id=doctors.doctor_id and pat_id=?;`;
 
   db.query(query,[id], (err, result) => {
     if (err) {
@@ -594,6 +601,7 @@ static fetchspecmaladiespatients(id){
 
     resolve(result);
   });
+ });
 }
 static calculerAge(dateNaissanceStr) {
     // Diviser la chaîne de caractères en jour, mois et année
