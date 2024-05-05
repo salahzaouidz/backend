@@ -511,7 +511,7 @@ static getprofileaccess(patientId){
 }
 static insertemailnews(email){
   return new Promise((resolve, reject) => {
-    const query = `insert into newslatteremails values(default,?)`;
+    const query = `insert into newslatteremails values(?)`;
 
     db.query(query,[email], (err, result) => {
       if (err) {
