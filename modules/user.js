@@ -334,7 +334,7 @@ resolve(res);
 }
 static patientsearch(patname){
     return new Promise ((resolve,reject) =>{
-        db.query('select patient_id as patientId,patient_firstname as firstName , patient_lastname as lastName, DATE_FORMAT(patient_dateb, "%Y-%m-%d") as age , patient_sexe as gender ,patient_photo as pfpUrl, profileaccess as isPublicAccount,user_login.email as email from patients,user_login where patients.patient_id=user_login.user_id and concat(patient_firstname," ",patient_lastname)=?;',[patname],(err,res)=>{
+        db.query('select patient_id as patientId,patient_firstname as firstName , patient_lastname as lastName, DATE_FORMAT(patient_dateb, "%Y-%m-%d") as age , patient_sexe as gender ,patient_photo as pfpUrl, profileaccess as isPublicAccount,user_login.email as email from patients,user_login where patients.patient_id=user_login.user_id and( concat(patient_firstname," ",patient_lastname)=? or concat(patient_lastname," ",patient_firstname)=? or patient_NIN=?);',[patname,patname,patname],(err,res)=>{
             if (err) {
     reject(err);           
      }    
