@@ -383,7 +383,7 @@ resolve(res);
 }
 static getConsultations(patientId) {
     return new Promise((resolve, reject) => {
-      const query = `SELECT consultation_id as consultationId, DATE_FORMAT(consultation_date,"%Y-%m-%d") as date, consultation_details as consultationSummary,consultation_maladie as maladie,spesialite.spes_des as category, doctors.doctor_id as doctorId FROM consultation, doctors WHERE consultation.doc_id = doctors.doctor_id and doctors.doc_spes=spesialite.id_spes AND pat_id = ?;`; 
+      const query = `SELECT consultation_id as consultationId, DATE_FORMAT(consultation_date,"%Y-%m-%d") as date, consultation_details as consultationSummary,consultation_maladie as maladie,spesialite.spes_des as category, doctors.doctor_id as doctorId FROM consultation, doctors,spesialite WHERE consultation.doc_id = doctors.doctor_id and doctors.doc_spes=spesialite.id_spes AND pat_id = ?;`; 
       db.query(query, [patientId], (err, consultations) => {
         if (err) {
           reject(err);
