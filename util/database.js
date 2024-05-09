@@ -6,7 +6,7 @@ user: 'freedb_useruser',
 database: 'freedb_medsecure',
 password: 'Vtc4kC*UaC%c6C7'
 
-
+ 
 });
 pool.getConnection((err)=>{    
     if(!err)
