@@ -132,7 +132,6 @@ try {
      const id = x[0].id; 
     const  role = x[0].role;
     app.locals.userid=id;
-    console.log(req.session.userid);
        switch (role) {
         case "admin": 
         res.redirect('/admin');
