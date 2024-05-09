@@ -147,7 +147,7 @@ try {
 
     }
 } catch (error) {
-    res.status(500).json(error);
+    res.status(401).json(error);
   console.log(error);
 
 }
