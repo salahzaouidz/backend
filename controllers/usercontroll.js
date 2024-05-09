@@ -127,7 +127,7 @@ try {
    const password = req.body.password;
     var x = await modeleuser.fetchuser(email,password);
     console.log(x);
-    if(!x) res.status(500).json('not found');
+    if(!x) res.status(500).json('email or password incorrect');
     else {
      const id = x[0].id; 
     const  role = x[0].role;
@@ -147,7 +147,7 @@ try {
 
     }
 } catch (error) {
-    res.json(error);
+    res.status(500).json(error);
   console.log(error);
 
 }
