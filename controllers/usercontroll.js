@@ -63,14 +63,14 @@ static async getmedicaments(req,res){
         } 
    }
    catch(error){
-    res.json({message:error});
+    res.status(500).json({message:error});
    }
 }
   static async getadmin(req,res){
   const i =app.locals.userid; console.log(i);
     try{
       var x = await modeleuser.fetchadmin(i);
-      if(!x) res.sattus(500).json({message:'not found'});
+      if(x.length===0) res.status(500).json({message:'not found'});
       else {
         var obj=x[0];
         const fname  = obj.admin_firstname; //console.log(fname);
@@ -91,7 +91,7 @@ static async getmedicaments(req,res){
 
     } catch(error){
         console.log(error);
-        res.json({message:'error'});
+        res.status(500).json({message:'error'});
     }
 
 
