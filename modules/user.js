@@ -226,9 +226,9 @@ resolve(true);
 })
 }
 
- static insertdoctor(id,emergency,iduser,docfname,doctor_lastname,city,wilaya,gender,nin,speciality,phone,birthdate,photo){
+ static insertdoctor(id,emergency,iduser,docfname,doctor_lastname,city,wilaya,gender,nin,speciality,phone,birthdate,photo,adminId){
     return new Promise ((resolve,reject) =>{
-        db.query('insert into doctors values (?,?,?,?,?,?,?,?,?,?,?,?,?)',[id,iduser,nin,docfname,doctor_lastname,speciality,birthdate,gender,city,wilaya,phone,emergency,photo],(err)=>{
+        db.query('insert into doctors values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)',[id,iduser,nin,docfname,doctor_lastname,speciality,birthdate,gender,city,wilaya,phone,emergency,photo,adminId],(err)=>{
             if (err) {
     reject(err);           
      }
@@ -359,7 +359,7 @@ resolve(res);
 }
 static getalergiespatient(patientId){
     return new Promise ((resolve,reject) =>{
-        db.query('SELECT alergies.aler_name as name , aler_note as symptoms ,DATE_FORMAT(alerdate , "%Y-%m-%d @ %H:%i")as date from alergies_patient,alergies where alergies_patient.idaler=alergies.aler_id and idpat=? ORDER by date DESC;',[patientId],(err,res)=>{
+        db.query('SELECT concat(doctors.doctor_firstname," ",doctors.doctor_lastname) as doctor, alergies.aler_name as name , aler_note as symptoms ,DATE_FORMAT(alerdate , "%Y-%m-%d @ %H:%i")as date from alergies_patient,alergies,doctors where alergies_patient.idaler=alergies.aler_id and alergies_patient.doc_id=doctors.doctor_id and idpat=? ORDER by date DESC;',[patientId],(err,res)=>{
             if (err) {
     reject(err);           
      }    
@@ -470,11 +470,11 @@ static getalergies(){
         });
       });
 }
-static addalergy(id,allergyName,date,allergySymptoms){
+static addalergy(id,allergyName,date,allergySymptoms,doctorId){
     return new Promise((resolve, reject) => {
-        const query = `insert into alergies_patient values(?,?,?,?)`;
+        const query = `insert into alergies_patient values(?,?,?,?,?)`;
     
-        db.query(query,[id,allergyName,date,allergySymptoms], (err, result) => {
+        db.query(query,[id,allergyName,date,allergySymptoms,doctorId], (err, result) => {
           if (err) {
             reject(err);
           }

@@ -3,12 +3,10 @@ const modeleuser = require('../modules/user');
 const express = require('express');
 const app = express();
 const transporter = require('../util/sendemails');
-const session = require('express-session');
 const bcrypt = require('bcryptjs');
 class usercontrollers{ 
 
 
-//signup doctors
 static async signupdoctors(req,res){
 const city = req.body.address;
 const fname = req.body.firstName;
@@ -38,7 +36,6 @@ try{
 
         }
 } 
- //getspecilaity
 static async getspeciality(req,res){
 try{
     var x = await modeleuser.getspec();
@@ -48,7 +45,6 @@ catch(error){
     console.log(error);
     res.status(500).json({messgae : 'error'});
 }}
-// get medecimantes name
 static async getmedicaments(req,res){
     try{
         var x = await modeleuser.getmed();
@@ -58,12 +54,11 @@ static async getmedicaments(req,res){
     catch(error){
         console.log(error);}
 }
-// getwilayanames
  static async getanalyses(req,res){
    try {
      var x  = await modeleuser.fetchanalysesname();
      if(!x) {
-        res.json({message:'not found'})     } else{
+        res.status(500).json({message:'not found'})     } else{
           res.json(x);
         } 
    }
@@ -71,12 +66,11 @@ static async getmedicaments(req,res){
     res.json({message:error});
    }
 }
-//adminlogin
   static async getadmin(req,res){
   const i =app.locals.userid; console.log(i);
     try{
       var x = await modeleuser.fetchadmin(i);
-      if(!x) res.json({message:'not found'});
+      if(!x) res.sattus(500).json({message:'not found'});
       else {
         var obj=x[0];
         const fname  = obj.admin_firstname; //console.log(fname);
@@ -102,22 +96,20 @@ static async getmedicaments(req,res){
 
 
 }
-//doctorsrequests
   static async doctorsrequests(req,res){
      
     try {
         var x = await modeleuser.fetchdoctorreq();
         if(x){
            console.log(x);
-            res.json(x);
-        } else res.json('errorooror');
+            res.status(200).json(x);
+        } else res.status(500).json('error');
         
     } catch (error) {
         console.log(error);
-        res.json(error);
+        res.status(500).json(error);
     }
 }
-//logindoctor
   static async logindoctor(req,res){
 try {
   const id = app.locals.userid;
@@ -125,22 +117,20 @@ try {
  
   res.json(x[0]);
 } catch (error) {
-    res.json(error);
+    res.status(500).json(error);
   console.log(error);
 }
 }
-//login
 static async login(req,res){
 try {
    const email = req.body.email;
    const password = req.body.password;
     var x = await modeleuser.fetchuser(email,password);
     console.log(x);
-    if(!x) res.json('not found');
+    if(!x) res.status(500).json('not found');
     else {
      const id = x[0].id; 
     const  role = x[0].role;
-   // app.locals.userid = id;
     app.locals.userid=id;
     console.log(req.session.userid);
        switch (role) {
@@ -162,9 +152,7 @@ try {
 
 }
 }
-//patientsignup
  static async patientsignup(req,res){
- // if(!message) return res.status(400).json({message:'body request not defined'});
     try {
     const addr = req.body.address;
     const blood = req.body.bloodType;
@@ -184,12 +172,11 @@ try {
     const confpasw = req.body.confirmPassword;
     const pfpUrl = req.body.pfpUrl;
     if(agreeToPrivacy===true && agreeToTerms===true && pass===confpasw){
-        //exsit of patient
         var y = await modeleuser.fetchuser(email,pass); console.log(y);
         if(y.length ===0) {
         var x = await modeleuser.signuppatinet(addr,email,pass,blood,height,weight,phone,providence,fname,lname,nin,gender,datebirth,pfpUrl);
          if(!x) res.json('eroror');
-         else {//res.status(501).json({message:'signup secsessfuly'}); 
+         else {
          const i = await modeleuser.fetchidpatient(email);
          app.locals.userid=i[0].id;
          res.redirect('/patientlogin');
@@ -208,6 +195,7 @@ static async doctoraccept(req,res){
     try {
         const id = req.body.doctorID;
         const emergency = req.body.isEmergency;
+        const adminId = req.body.adminId;
         var x = await modeleuser.getdoctortemp(id);
         const email = x[0].email;
         const password = x[0].password;
@@ -224,7 +212,7 @@ static async doctoraccept(req,res){
         const phone = x[0].phone;
         const birthdate = x[0].birthdate;
       const photo = x[0].image;
-        var w = await modeleuser.insertdoctor(id,emergency,iduser,docfname,doctor_lastname,city,wilaya,gender,nin,speciality,phone,birthdate,photo);
+        var w = await modeleuser.insertdoctor(id,emergency,iduser,docfname,doctor_lastname,city,wilaya,gender,nin,speciality,phone,birthdate,photo,adminId);
          var d = await modeleuser.deletetempdoctor(id);
          const emailtext="hello "+docfname+" "+doctor_lastname+"\nthank you for your signup with us your account like doctor was created !\nsee you soon!! "
          const mailOptions = {
@@ -256,7 +244,7 @@ static async deletetempdoctor(req,res){
         var x = await modeleuser.deletetempdoctor(id);
         res.json({message:"the doctor deleted secsfully"});
     } catch (error) {
-        res.json({wrong:error});
+        res.status(500).json({wrong:error});
     }
 }
 static async addconsultation(req,res){
@@ -286,7 +274,7 @@ static async addconsultation(req,res){
     }
     res.json({message:'consultation is enregistred'});
    } catch (error) {
-    res.json({error});
+    res.status(500).json({error});
     console.log(error);
    }
 
@@ -295,12 +283,9 @@ static async addconsultation(req,res){
 //search pateints from doctors
 static async searchpatients(req,res){
     try {
-        //const doctorId = req.body.doctorId;
+       
         const namepat = req.body.patientName;
-        //var x = await modeleuser.getemergencydoc(doctorId);
         var y = await modeleuser.patientsearch(namepat);
-        console.log(y[0].age);
-     // console.log(y[0].age.split('T').map(0));
        
         if(y.length!=0){
             y[0].age= await modeleuser.calculerAge(y[0].age);
@@ -316,26 +301,23 @@ static async searchpatients(req,res){
            patientId:y[0].patientId
         })
     }
-    else res.json('message: patient not found');
+    else res.status(200).json(null);
 } catch (error) {
-        res.json('error:' + error);
+        res.status(500).json('error:' + error);
         console.log(error);
     }
 }
 static async loginpatient(req,res){
   try {
-   // const id = app.locals.userid;
    const id = app.locals.userid;
    
     console.log(id);
   const x = await modeleuser.getpatientinfo(id);
- //x[0].dateOfBirth = new Date(x[0].dateOfBirth).toISOString().split('T')[0];
   x[0].age = await modeleuser.calculerAge(x[0].dateOfBirth);
-  //const responseObject ={} x;
-  //const responseObject = "users:" + JSON.stringify(x);
-  res.json(x[0]);
+  res.status(200).json(x[0]);
   } catch (error) {
-    res.json(error);
+    res.status(500).json(error);
+    console.log(error);
   }
  
 }
@@ -347,13 +329,12 @@ static async fetchalergies(req,res){
     const y = await modeleuser.fetchidpatient(email);
     if(y[0].id===patientId){
     const x = await modeleuser.getalergiespatient(patientId);
-    let i = 0;
-   
     res.json(x);
  }
-else res.json([]);
+else res.status(200).json([]);
 } catch (error) {
-    res.json(error);
+    res.status(500).json(error);
+    console.log(error);
  }
 }
 static async fetchanalyses(req,res){
@@ -361,24 +342,12 @@ static async fetchanalyses(req,res){
         const id = req.body.patientId;
         const x = await modeleuser.fetchanalyses(id);
       if(x.length>0)
-        res.json(x);
-else res.json([]);
+        res.status(200).json(x);
+else res.status(200).json([]);
     } catch (error) {
-        res.json(error);
+        res.status(500).json(error);
     }
 }
-static async medicalhistory(req,res){
-    try {
-        const email = req.body.email;
-        const password = req.body.password;
-        var x = modeleuser.fetchuserpatient(email,password);
-        const id = x[0].idd;
-
-    } catch (error) {
-        res,json(error);
-    }
-}
-//original one
  static  async  getMedicalHistory(req, res) {
   
     try {
@@ -388,7 +357,7 @@ static async medicalhistory(req,res){
         if(x[0].id===patientId){
       const consultations = await modeleuser.getConsultations(patientId);
       if (consultations.length === 0) {
-        res.json([]);
+        res.status(200).json([]);
         return;
       }
   
@@ -426,9 +395,9 @@ static async medicalhistory(req,res){
         medicalHistory.push(consultationDetails);
       }
   
-      res.json(medicalHistory);
+      res.status(200).json(medicalHistory);
    }
-  else res.json("error request");
+  else res.status(500).json("error request");
 } catch (error) {
       console.error('Erreur lors de la récupération de l\'historique médical : ' + error.stack);
       res.status(500).json({ error: 'Erreur lors de la récupération de l\'historique médical' });
@@ -437,9 +406,9 @@ static async medicalhistory(req,res){
   static async getalergies(req,res){
     try {
         var x = await modeleuser.getalergies();
-        res.json(x);
+        res.status(200).json(x);
     } catch (error) {
-        res.json(error);
+        res.status(500).json(error);
     }
   }
 
@@ -449,10 +418,11 @@ static async addalergy(req,res){
         const allergyName = req.body.allergyName;
         const date = req.body.date;
         const allergySymptoms = req.body.allergySymptoms;
-        var x = await modeleuser.addalergy(id,allergyName,date,allergySymptoms);
-      res.json("allergy add");
+        const doctorId = req.body.doctorId;
+        var x = await modeleuser.addalergy(id,allergyName,date,allergySymptoms,doctorId);
+      res.status(200).json("allergy add");
     } catch (error) {
-        res.json(error);
+        res.status(500).json(error);
         console.log(error);
     }
 }
@@ -465,10 +435,10 @@ static async profilechangeacess(req,res){
         const x = await modeleuser.fetchidpatient(email);
         if(x[0].id===patientId){
             const y = await modeleuser.setprofileacess(profileaccess,patientId);
-            res.json({isPublicAccount:profileaccess});
-        } else res.json('error de security')
+            res.status(200).json({isPublicAccount:profileaccess});
+        } else res.status(500).json('error de security')
     } catch (error) {
-        res.json({"error":error});
+        res.status(500).json({"error":error});
         console.log(error);
     }
 }
@@ -479,11 +449,11 @@ static async getprofilestatus(req,res){
     const x = await modeleuser.fetchidpatient(email);
         if(x[0].id===patientId){
           var y = await modeleuser.getprofileaccess(patientId);  
-          res.json(y[0]);          
+          res.status(200).json(y[0]);          
         }
-    else res.json("error de secirity");
+    else res.json("error de security");
   } catch (error) {
-    res.json(error);
+    res.status(500).json(error);
     console.log(error);
   }
 }
@@ -498,7 +468,7 @@ static async viewprofile(req,res){
              res.redirect('/patientlogin');
         }
   } catch (error) {
-    res.json(error);
+    res.status(500).json(error);
   }
 }
 
@@ -507,15 +477,15 @@ static async getmaladies(req,res){
     var x = await modeleuser.getmaladies();
     res.json(x);
   } catch (error) {
-    res.json(error);
+    res.status(500).json(error);
   }
 }
 static async operations(req,res){
   try {
     var x = await modeleuser.getoperations();
-    res.json(x);
+    res.satatus(200).json(x);
   } catch (error) {
-    res.json(error);
+    res.status(500).json(error);
   }
 }
 static async setoperations(req,res){
@@ -526,9 +496,9 @@ static async setoperations(req,res){
   const doctorId = req.body.doctorId;
   const date =req.body.date;
   var x = await modeleuser.setopertaionspatient(patientId,name,details,doctorId,date);
-  res.json("operation add");}
+  res.status(200).json("operation add");}
 
-  catch(error){ res.json(error);}
+  catch(error){ res.status(500).json(error);}
 }
 static async setspecmaladies(req,res){
   try{
@@ -538,9 +508,9 @@ static async setspecmaladies(req,res){
   const doctorId = req.body.doctorId;
   const date =req.body.date;
   var x = await modeleuser.setspecmaladies(patientId,name,details,doctorId,date);
-  res.json("operation add");}
+  res.status(200).json("operation add");}
 
-  catch(error){ res.json(error);}
+  catch(error){ res.status(500).json(error);}
 }
 static async getoperationspatients(req,res){
   try {
@@ -549,10 +519,10 @@ static async getoperationspatients(req,res){
     const x = await modeleuser.fetchidpatient(email);
         if(x[0].id===id){
           const y = await modeleuser.fetchopeartionspatients(id);   
-          res.json(y);
-        } else res.json([]);
+          res.status(200).json(y);
+        } else res.status(200).json([]);
   } catch (error) {
-    res.json(error);
+    res.status(500).json(error);
   }
 }
 static async getspecmaladiespatients(req,res){
@@ -562,10 +532,10 @@ static async getspecmaladiespatients(req,res){
     const x = await modeleuser.fetchidpatient(email);
         if(x[0].id===id){
           const y = await modeleuser.fetchspecmaladiespatients(id);   
-          res.json(y);
-        } else res.json([]);
+          res.status(200).json(y);
+        } else res.status(200).json([]);
   } catch (error) {
-    res.json(error);
+    res.status(500).json(error);
   }
 }
 
@@ -574,13 +544,13 @@ const email = req.body.email;
 try{
 var x = await modeleuser.insertemailnews(email);}
 catch (error){
-  res.json(error);
+  res.status(500).json(error);
 }
 
     const mailOptions = {
       from: 'MedSecure Website', 
       to: email,
-      subject: "Newsletter joining",
+      subject: "Newsletter Joining",
       text: "Hi there \nWe're thrilled that you're joining our newsletter. You'll receive updates every week. \nThank you\nMedsecure Support"
     };
   
@@ -590,7 +560,7 @@ catch (error){
         res.status(500).send('Error sending email');
       } else {
         console.log('Email sent:', info.response);
-        res.send('Email sent successfully');
+        res.status(200).send('Email sent successfully');
       }
     });
   };

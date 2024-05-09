@@ -3,19 +3,19 @@ const controllers = require('../controllers/usercontroll');
 
 //endpoints project
 
-router.post('/doctors/signup',controllers.signupdoctors); //doctor signup
-router.get('/specialty',controllers.getspeciality); //speciality
+router.post('/doctors/signup',controllers.signupdoctors); 
+router.get('/specialty',controllers.getspeciality); 
 router.get('/alergys',controllers.getalergies)
-router.get('/medname',controllers.getmedicaments); //medecines name
-router.get('/analyses',controllers.getanalyses); //wilayanames
-router.get('/admin',controllers.getadmin); //login admin
-router.get('/admin/doctorsrequests',controllers.doctorsrequests); //doctorrequests
-router.get('/doctor',controllers.logindoctor);//login doctor
-router.post('/login',controllers.login);//login
-router.post('/patient/signup',controllers.patientsignup); //patient signup
-router.post('/admin/doctoraccept',controllers.doctoraccept); //acceptdoctornoramleandemergency
-router.post('/admin/rejectdoctor',controllers.deletetempdoctor);//deletetempdoctor
-router.post('/consultationadd',controllers.addconsultation); //add consultations
+router.get('/medname',controllers.getmedicaments); 
+router.get('/analyses',controllers.getanalyses); 
+router.get('/admin',controllers.getadmin); 
+router.get('/admin/doctorsrequests',controllers.doctorsrequests); 
+router.get('/doctor',controllers.logindoctor);
+router.post('/login',controllers.login);
+router.post('/patient/signup',controllers.patientsignup); 
+router.post('/admin/doctoraccept',controllers.doctoraccept); 
+router.post('/admin/rejectdoctor',controllers.deletetempdoctor);
+router.post('/consultationadd',controllers.addconsultation); 
 router.post('/addalergy',controllers.addalergy)
 router.post('/searchpatients',controllers.searchpatients);
 router.get('/patientlogin',controllers.loginpatient);
