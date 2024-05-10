@@ -229,7 +229,8 @@ static async doctoraccept(req,res){
         const phone = x[0].phone;
         const birthdate = x[0].birthdate;
       const photo = x[0].image;
-        var w = await modeleuser.insertdoctor(id,emergency,iduser,docfname,doctor_lastname,city,wilaya,gender,nin,speciality,phone,birthdate,photo,adminId);
+      const datesignup = x[0].datesignup;
+        var w = await modeleuser.insertdoctor(id,emergency,iduser,docfname,doctor_lastname,city,wilaya,gender,nin,speciality,phone,birthdate,datesignup,photo,adminId);
          var d = await modeleuser.deletetempdoctor(id);
          const emailtext="hello "+docfname+" "+doctor_lastname+"\nthank you for your signup with us your account like doctor was created !\nsee you soon!! "
          const mailOptions = {
