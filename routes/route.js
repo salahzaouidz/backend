@@ -32,5 +32,6 @@ router.post('/setmaladies',controllers.setspecmaladies);
 router.post('/setoperations',controllers.setoperations);
 router.post('/getoperationspatient',controllers.getoperationspatients);
 router.post('/getmaladiespatients',controllers.getspecmaladiespatients);
+router.post('/resetpassword',controllers.changepassword);
 
 module.exports = router;
