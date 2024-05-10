@@ -151,6 +151,18 @@ try {
 
 }
 }
+static async  changepassword(req,res){
+  try{
+ const email = req.body.email;
+ const pass = req.body.password;
+ const newpass = req.body.newpassword;
+ const x = await modeleuser.resetpassword(email,pass,newpass);
+ res.json("password changed");
+  } catch(error){
+    res.status(500).json(error);
+  }
+
+} 
  static async patientsignup(req,res){
     try {
     const addr = req.body.address;
