@@ -126,6 +126,19 @@ static resetpassword(email,pass,newpass){
        });
 })
   }  
+static fetchpassword(email){
+  return new Promise ((resolve,reject) =>{
+    db.query('select  user_login.password from user_login where email=?;',[email],(err,result)=>{
+        if (err) {
+reject(err);           
+ }    
+else
+        resolve(result);   
+        console.log(result);
+
+     });
+})
+}  
 static fetchuser(email,password){
         return new Promise ((resolve,reject) =>{
             db.query('select user_id as id,role from user_login where email=? and password=?',[email,password],(err,result)=>{
