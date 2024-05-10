@@ -67,7 +67,7 @@ static fetchanalysesname(){
 
 static fetchadmin(i){
     return new Promise ((resolve,reject) =>{
-        db.query('select admin_firstname,admin_lastname from admin where admin_id=?',[i],(err,result)=>{
+        db.query('select admin_id as adminId,admin_firstname,admin_lastname from admin where admin_id=?;',[i],(err,result)=>{
             //console.log("sql");
             if (err) {
     reject(err);           
