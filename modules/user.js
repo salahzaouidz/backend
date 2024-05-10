@@ -252,9 +252,9 @@ resolve(true);
 })
 }
 
- static insertdoctor(id,emergency,iduser,docfname,doctor_lastname,city,wilaya,gender,nin,speciality,phone,birthdate,photo,adminId){
+ static insertdoctor(id,emergency,iduser,docfname,doctor_lastname,city,wilaya,gender,nin,speciality,phone,datesignup,photo,adminId){
     return new Promise ((resolve,reject) =>{
-        db.query('insert into doctors values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)',[id,iduser,nin,docfname,doctor_lastname,speciality,birthdate,gender,city,wilaya,phone,emergency,photo,adminId],(err)=>{
+        db.query('insert into doctors values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)',[id,iduser,nin,docfname,doctor_lastname,speciality,datesignup,gender,city,wilaya,phone,emergency,photo,adminId],(err)=>{
             if (err) {
     reject(err);           
      }
