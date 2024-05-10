@@ -75,8 +75,10 @@ static async getmedicaments(req,res){
         var obj=x[0];
         const fname  = obj.admin_firstname; //console.log(fname);
         const lname = obj.admin_lastname;
+        const adminIdd=obj.adminId;
         res.json({
         role : 'admin',
+        adminId: adminIdd,
         firstname : fname,
         lastname : lname,
     stats:{
