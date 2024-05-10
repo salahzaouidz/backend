@@ -498,7 +498,7 @@ static async getmaladies(req,res){
 static async operations(req,res){
   try {
     var x = await modeleuser.getoperations();
-    res.satatus(200).json(x);
+    res.status(200).json(x);
   } catch (error) {
     res.status(500).json(error);
   }
