@@ -113,6 +113,19 @@ static fetchdoctor(id){
          });
 })
   }
+static resetpassword(email,pass,newpass){
+    return new Promise ((resolve,reject) =>{
+      db.query('update  user_login set user_login.password=? where email=? and password=?;',[email,pass,newpass],(err,result)=>{
+          if (err) {
+  reject(err);           
+   }    
+  else
+          resolve(result);   
+          console.log(result);
+
+       });
+})
+  }  
 static fetchuser(email,password){
         return new Promise ((resolve,reject) =>{
             db.query('select user_id as id,role from user_login where email=? and password=?',[email,password],(err,result)=>{
