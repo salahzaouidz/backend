@@ -156,13 +156,17 @@ static async  changepassword(req,res){
  const email = req.body.email;
  const pass = req.body.password;
  const newpass = req.body.newpassword;
- const x = await modeleuser.resetpassword(email,pass,newpass);
- res.json("password changed");
+ const y = await modeleuser.fetchpassword(email);
+ if(y[0].password===pass){
+  const x = await modeleuser.resetpassword(email,pass,newpass);
+  res.json("password changed");
+ }
+ else res.status(401).json("old password incorrect");
   } catch(error){
     res.status(500).json(error);
   }
 
-} 
+}
  static async patientsignup(req,res){
     try {
     const addr = req.body.address;
