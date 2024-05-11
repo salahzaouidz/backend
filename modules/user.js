@@ -115,7 +115,7 @@ static fetchdoctor(id){
   }
 static resetpassword(email,pass,newpass){
     return new Promise ((resolve,reject) =>{
-      db.query('update  user_login set user_login.password=? where email=? and password=?;',[email,pass,newpass],(err,result)=>{
+      db.query('update  user_login set user_login.password=? where email=? and password=?;',[newpass,email,pass],(err,result)=>{
           if (err) {
   reject(err);           
    }    
