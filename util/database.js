@@ -2,9 +2,9 @@ const mysql = require('mysql2');
 
 const pool = mysql.createPool({
 host : 'sql.freedb.tech',
-user: 'freedb_useruser',
+user: 'freedb_salahuser',
 database: 'freedb_medsecure',
-password: 'Vtc4kC*UaC%c6C7'
+password: '*nV#J6P*2xQCyMc'
 
  
 });
